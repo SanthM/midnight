@@ -7,4 +7,4 @@
 Comando de Instalación:
 
 
-`pkg install python && pkg install git && git clone https://github.com/SanthM/midnight-beta && cd midnight-beta && python midnight.py`
+`pkg install python && pkg install git && git clone https://github.com/SanthM/midnight-beta && cd midnight-beta && pip install requirements.txt && python midnight.py`
