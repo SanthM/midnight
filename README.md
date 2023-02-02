@@ -1,10 +1,12 @@
-# midnight-beta
-(NUEVA BETA) Script De Denegación de Servicio Hecho de 0 Al Estilo Slowloris, De Envio De Paquetes Simultaneos, Fase Beta Version v1.5.1
+# midnight
+(VERSION TERMINADA) Script De Denegación de Servicio Hecho de 0 Al Estilo Slowloris, De Envio De Paquetes Simultaneos, Fase Beta Version v1.5.1
 -Agregado:
-•Paquetes De Tipo HTTP GET Y POST
+•Paquetes De Tipo HTTP GET, POST, CRASH Y ULTRA
 •Los Paquetes Se Mantienen En El Servidor y No Se Cierran
+•IP Filter
+•User-Agent Random
 •Nuevos Requerimientos
 Comando de Instalación:
 
 
-`pkg install python && pkg install git && git clone https://github.com/SanthM/midnight-beta2 && cd midnight-beta2 && pip install requirements.txt && python midnight.py`
+`pkg install python && pkg install git && git clone https://github.com/SanthM/midnight && cd midnight && pip install requirements.txt && python midnight.py`
