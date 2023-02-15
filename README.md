@@ -10,3 +10,6 @@ Comando de Instalación:
 
 
 `pkg install python && pkg install git && git clone https://github.com/SanthM/midnight && cd midnight && pip install requirements.txt && python midnight.py`
+
+AGREGADO - Midnight 2 Solo Para Linux
+
