@@ -1,8 +1,0 @@
-{
-  "name": "mi-proyecto",
-  "version": "1.0.0",
-  "type": "module", // Agregar esta línea
-  "dependencies": {
-    "@adiwajshing/baileys": "^4.5.0"
-  }
-}
